@@ -56,6 +56,8 @@ Neural networks: [Equinox](https://github.com/patrick-kidger/equinox).
 
 Numerical differential equation solvers: [Diffrax](https://github.com/patrick-kidger/diffrax).
 
+Type annotations and runtime checking for PyTrees and shape/dtype of JAX arrays: [jaxtyping](https://github.com/google/jaxtyping). 
+
 ### Disclaimer
 
 This is not an official Google product.
