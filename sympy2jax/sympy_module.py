@@ -13,8 +13,9 @@
 # limitations under the License.
 
 import abc
+import collections as co
 import functools as ft
-from typing import Any, Callable
+from typing import Any, Callable, Optional
 
 import equinox as eqx
 import jax
@@ -227,13 +228,26 @@ def _is_node(x):
 
 class SymbolicModule(eqx.Module):
     nodes: PyTree
+    has_extra_funcs: bool = eqx.static_field()
 
-    def __init__(self, expressions: PyTree, **kwargs):
+    def __init__(
+        self, expressions: PyTree, extra_funcs: Optional[dict] = None, **kwargs
+    ):
         super().__init__(**kwargs)
-        _convert = ft.partial(_sympy_to_node, memodict=_IdDict(), func_lookup=_lookup)
+        if extra_funcs is None:
+            lookup = _lookup
+            self.has_extra_funcs = False
+        else:
+            lookup = co.ChainMap(extra_funcs, _lookup)
+            self.has_extra_funcs = True
+        _convert = ft.partial(_sympy_to_node, memodict=_IdDict(), func_lookup=lookup)
         self.nodes = jax.tree_map(_convert, expressions)
 
     def sympy(self) -> sympy.Expr:
+        if self.has_extra_funcs:
+            raise NotImplementedError(
+                "SymbolicModule cannot be converted back to SymPy if `extra_funcs` is passed"
+            )
         memodict = _IdDict()
         return jax.tree_map(
             lambda n: n.sympy(memodict, _reverse_lookup), self.nodes, is_leaf=_is_node

@@ -15,6 +15,7 @@
 import equinox as eqx
 import jax
 import jax.numpy as jnp
+import jax.random as jr
 import sympy
 
 import sympy2jax
@@ -120,3 +121,25 @@ def test_rational():
     mod = sympy2jax.SymbolicModule(y)
     assert mod(x=1.0) == 1 + 3 / 7
     assert mod.sympy() == y
+
+
+def test_extra_funcs():
+    class _MLP(eqx.Module):
+        mlp: eqx.nn.MLP
+
+        def __init__(self):
+            self.mlp = eqx.nn.MLP(1, 1, 2, 2, key=jr.PRNGKey(0))
+
+        def __call__(self, x):
+            x = jnp.asarray(x)
+            return self.mlp(x[None])[0]
+
+    expr = sympy.parsing.sympy_parser.parse_expr("f(x) + y")
+    mlp = _MLP()
+    mod = sympy2jax.SymbolicModule(expr, {sympy.Function("f"): mlp})
+    mod(x=1.0, y=2.0)
+
+    def _get_params(module):
+        return {id(x) for x in jax.tree_leaves(module) if eqx.is_array(x)}
+
+    assert _get_params(mod).issuperset(_get_params(mlp))
