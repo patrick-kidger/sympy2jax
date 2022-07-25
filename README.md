@@ -37,12 +37,13 @@ params = jax.tree_leaves(mod)  # 1.0 and 2.0 are parameters.
 ## Documentation
 
 ```python
-sympytorch.SymbolicModule(expressions, extra_funcs=None)
+sympytorch.SymbolicModule(expressions, extra_funcs=None, make_array=True)
 ```
 
 Where:
 - `expressions` is a PyTree of SymPy expressions.
 - `extra_funcs` is an optional dictionary from SymPy functions to JAX operations, to extend the built-in translation rules.
+- `make_array` is whether integers/floats/rationals should be stored as Python integers/etc., or as JAX arrays.
 
 Instances can be called with key-value pairs of symbol-value, as in the above example.
 
