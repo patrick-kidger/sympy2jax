@@ -122,12 +122,19 @@ class _Symbol(_AbstractNode):
         return sympy.Symbol(self._name)
 
 
+def _maybe_array(val, make_array):
+    if make_array:
+        return jnp.asarray(val)
+    else:
+        return val
+
+
 class _Integer(_AbstractNode):
     _value: jnp.ndarray
 
-    def __init__(self, expr: sympy.Expr):
+    def __init__(self, expr: sympy.Expr, make_array: bool):
         assert isinstance(expr, sympy.Integer)
-        self._value = jnp.asarray(int(expr))
+        self._value = _maybe_array(int(expr), make_array)
 
     def __call__(self, memodict: _IdDict):
         return self._value
@@ -140,9 +147,9 @@ class _Integer(_AbstractNode):
 class _Float(_AbstractNode):
     _value: jnp.ndarray
 
-    def __init__(self, expr: sympy.Expr):
+    def __init__(self, expr: sympy.Expr, make_array: bool):
         assert isinstance(expr, sympy.Float)
-        self._value = jnp.asarray(float(expr))
+        self._value = _maybe_array(float(expr), make_array)
 
     def __call__(self, memodict: _IdDict):
         return self._value
@@ -156,10 +163,10 @@ class _Rational(_AbstractNode):
     _numerator: jnp.ndarray
     _denominator: jnp.ndarray
 
-    def __init__(self, expr: sympy.Expr):
+    def __init__(self, expr: sympy.Expr, make_array: bool):
         assert isinstance(expr, sympy.Rational)
-        self._numerator = jnp.asarray(int(expr.numerator))
-        self._denominator = jnp.asarray(int(expr.denominator))
+        self._numerator = _maybe_array(int(expr.numerator), make_array)
+        self._denominator = _maybe_array(int(expr.denominator), make_array)
 
     def __call__(self, memodict: _IdDict):
         return self._numerator / self._denominator
@@ -173,12 +180,16 @@ class _Func(_AbstractNode):
     _func: Callable
     _args: list
 
-    def __init__(self, expr: sympy.Expr, memodict: _IdDict, func_lookup: dict):
+    def __init__(
+        self, expr: sympy.Expr, memodict: _IdDict, func_lookup: dict, make_array: bool
+    ):
         try:
             self._func = func_lookup[expr.func]
         except KeyError as e:
             raise KeyError(f"Unsupported Sympy type {type(expr)}") from e
-        self._args = [_sympy_to_node(arg, memodict, func_lookup) for arg in expr.args]
+        self._args = [
+            _sympy_to_node(arg, memodict, func_lookup, make_array) for arg in expr.args
+        ]
 
     def __call__(self, memodict: _IdDict):
         args = []
@@ -203,7 +214,7 @@ class _Func(_AbstractNode):
 
 
 def _sympy_to_node(
-    expr: sympy.Expr, memodict: _IdDict, func_lookup: dict
+    expr: sympy.Expr, memodict: _IdDict, func_lookup: dict, make_array: bool
 ) -> _AbstractNode:
     try:
         return memodict[expr]
@@ -211,13 +222,13 @@ def _sympy_to_node(
         if isinstance(expr, sympy.Symbol):
             out = _Symbol(expr)
         elif isinstance(expr, sympy.Integer):
-            out = _Integer(expr)
+            out = _Integer(expr, make_array)
         elif isinstance(expr, sympy.Float):
-            out = _Float(expr)
+            out = _Float(expr, make_array)
         elif isinstance(expr, sympy.Rational):
-            out = _Rational(expr)
+            out = _Rational(expr, make_array)
         else:
-            out = _Func(expr, memodict, func_lookup)
+            out = _Func(expr, memodict, func_lookup, make_array)
         memodict[expr] = out
         return out
 
@@ -231,7 +242,11 @@ class SymbolicModule(eqx.Module):
     has_extra_funcs: bool = eqx.static_field()
 
     def __init__(
-        self, expressions: PyTree, extra_funcs: Optional[dict] = None, **kwargs
+        self,
+        expressions: PyTree,
+        extra_funcs: Optional[dict] = None,
+        make_array: bool = True,
+        **kwargs,
     ):
         super().__init__(**kwargs)
         if extra_funcs is None:
@@ -240,7 +255,12 @@ class SymbolicModule(eqx.Module):
         else:
             lookup = co.ChainMap(extra_funcs, _lookup)
             self.has_extra_funcs = True
-        _convert = ft.partial(_sympy_to_node, memodict=_IdDict(), func_lookup=lookup)
+        _convert = ft.partial(
+            _sympy_to_node,
+            memodict=_IdDict(),
+            func_lookup=lookup,
+            make_array=make_array,
+        )
         self.nodes = jax.tree_map(_convert, expressions)
 
     def sympy(self) -> sympy.Expr:
