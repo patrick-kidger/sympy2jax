@@ -158,8 +158,15 @@ class _Rational(_AbstractNode):
 
     def __init__(self, expr: sympy.Expr, make_array: bool):
         assert isinstance(expr, sympy.Rational)
-        self._numerator = _maybe_array(int(expr.numerator), make_array)
-        self._denominator = _maybe_array(int(expr.denominator), make_array)
+        numerator = expr.numerator
+        denominator = expr.denominator
+        if callable(numerator):
+            # Support SymPy < 1.10
+            numerator = numerator()
+        if callable(denominator):
+            denominator = denominator()
+        self._numerator = _maybe_array(int(numerator), make_array)
+        self._denominator = _maybe_array(int(denominator), make_array)
 
     def __call__(self, memodict: dict):
         return self._numerator / self._denominator
