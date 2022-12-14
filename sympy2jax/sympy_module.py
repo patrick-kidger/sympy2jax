@@ -26,6 +26,9 @@ import sympy
 
 PyTree = Any
 
+concatenate = sympy.Function("concatenate")
+stack = sympy.Function("stack")
+
 
 def _reduce(fn):
     def fn_(*args):
@@ -34,7 +37,16 @@ def _reduce(fn):
     return fn_
 
 
+def _args_as_array(fn):
+    def fn_(*args):
+        return fn(jnp.array(args))
+
+    return fn_
+
+
 _lookup = {
+    concatenate: _args_as_array(jnp.concatenate),
+    stack: _args_as_array(jnp.stack),
     sympy.Mul: _reduce(jnp.multiply),
     sympy.Add: _reduce(jnp.add),
     sympy.div: jnp.divide,

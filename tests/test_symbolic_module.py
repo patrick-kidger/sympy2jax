@@ -143,3 +143,23 @@ def test_extra_funcs():
         return {id(x) for x in jax.tree_leaves(module) if eqx.is_array(x)}
 
     assert _get_params(mod).issuperset(_get_params(mlp))
+
+
+def test_concatenate():
+    x, y, z = sympy.symbols("x y z")
+    cat = sympy2jax.concatenate(x, y, z)
+    mod = sympy2jax.SymbolicModule(expressions=cat)
+    assert_equal(
+        mod(x=jnp.array([0.4, 0.5]), y=jnp.array([0.6, 0.7]), z=jnp.array([0.8, 0.9])),
+        jnp.array([0.4, 0.5, 0.6, 0.7, 0.8, 0.9]),
+    )
+
+
+def test_stack():
+    x, y, z = sympy.symbols("x y z")
+    stack = sympy2jax.stack(x, y, z)
+    mod = sympy2jax.SymbolicModule(expressions=stack)
+    assert_equal(
+        mod(x=jnp.array(0.4), y=jnp.array(0.5), z=jnp.array(0.6)),
+        jnp.array([0.4, 0.5, 0.6]),
+    )
