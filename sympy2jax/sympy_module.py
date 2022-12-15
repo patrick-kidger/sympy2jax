@@ -37,16 +37,16 @@ def _reduce(fn):
     return fn_
 
 
-def _args_as_array(fn):
+def _single_args(fn):
     def fn_(*args):
-        return fn(jnp.array(args))
+        return fn(args)
 
     return fn_
 
 
 _lookup = {
-    concatenate: _args_as_array(jnp.concatenate),
-    stack: _args_as_array(jnp.stack),
+    concatenate: _single_args(jnp.concatenate),
+    stack: _single_args(jnp.stack),
     sympy.Mul: _reduce(jnp.multiply),
     sympy.Add: _reduce(jnp.add),
     sympy.div: jnp.divide,
