@@ -67,6 +67,8 @@ Instances have a `.sympy()` method that translates the module back into a PyTree
 
 [Eqxvision](https://github.com/paganpasta/eqxvision): computer vision models.
 
+[Levanter](https://github.com/stanford-crfm/levanter): scalable+reliable training of foundation models (e.g. LLMs).
+
 ### Disclaimer
 
 This is not an official Google product.
