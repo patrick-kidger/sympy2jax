@@ -55,19 +55,25 @@ Instances have a `.sympy()` method that translates the module back into a PyTree
 
 ### See also: other libraries in the JAX ecosystem
 
+[jaxtyping](https://github.com/google/jaxtyping): type annotations for shape/dtype of arrays.
+
 [Equinox](https://github.com/patrick-kidger/equinox): neural networks.
 
 [Optax](https://github.com/deepmind/optax): first-order gradient (SGD, Adam, ...) optimisers.
 
 [Diffrax](https://github.com/patrick-kidger/diffrax): numerical differential equation solvers.
 
-[Lineax](https://github.com/google/lineax): linear solvers and linear least squares.
+[Optimistix](https://github.com/patrick-kidger/optimistix): root finding, minimisation, fixed points, and least squares.
 
-[jaxtyping](https://github.com/google/jaxtyping): type annotations for shape/dtype of arrays.
+[Lineax](https://github.com/google/lineax): linear solvers.
+
+[BlackJAX](https://github.com/blackjax-devs/blackjax): probabilistic+Bayesian sampling.
 
 [Eqxvision](https://github.com/paganpasta/eqxvision): computer vision models.
 
 [Levanter](https://github.com/stanford-crfm/levanter): scalable+reliable training of foundation models (e.g. LLMs).
+
+[PySR](https://github.com/milesCranmer/PySR): symbolic regression. (Non-JAX honourable mention!)
 
 ### Disclaimer
 
