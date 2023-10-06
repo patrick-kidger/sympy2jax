@@ -69,6 +69,8 @@ Instances have a `.sympy()` method that translates the module back into a PyTree
 
 [BlackJAX](https://github.com/blackjax-devs/blackjax): probabilistic+Bayesian sampling.
 
+[Orbax](https://github.com/google/orbax): checkpointing (async/multi-host/multi-device).
+
 [Eqxvision](https://github.com/paganpasta/eqxvision): computer vision models.
 
 [Levanter](https://github.com/stanford-crfm/levanter): scalable+reliable training of foundation models (e.g. LLMs).
