@@ -93,6 +93,13 @@ _lookup = {
     sympy.Determinant: jnp.linalg.det,
 }
 
+_constant_lookup = {
+    sympy.E: jnp.e,
+    sympy.pi: jnp.pi,
+    sympy.EulerGamma: jnp.euler_gamma,
+    sympy.I: 1j,
+}
+
 _reverse_lookup = {v: k for k, v in _lookup.items()}
 assert len(_reverse_lookup) == len(_lookup)
 
@@ -201,22 +208,15 @@ class _Constant(_AbstractNode):
     _value: jnp.ndarray
     _expr: sympy.Expr
 
-    _constant_lookup = {
-        sympy.E: jnp.e,
-        sympy.pi: jnp.pi,
-        sympy.EulerGamma: jnp.euler_gamma,
-        sympy.I: 1j,
-    }
     def __init__(self, expr: sympy.Expr, make_array: bool):
-        assert expr in (sympy.E, sympy.pi, sympy.EulerGamma, sympy.I)
-        self._value = _maybe_array(self._constant_lookup[expr], make_array)
+        assert expr in _constant_lookup
+        self._value = _maybe_array(_constant_lookup[expr], make_array)
         self._expr = expr
 
     def __call__(self, memodict: dict):
         return self._value
 
     def sympy(self, memodict: dict, func_lookup: dict) -> sympy.Expr:
-        # memodict not needed as sympy deduplicates internally
         return self._expr
 
 
