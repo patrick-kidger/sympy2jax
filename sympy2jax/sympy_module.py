@@ -15,7 +15,8 @@
 import abc
 import collections as co
 import functools as ft
-from typing import Any, Callable, Optional
+from collections.abc import Callable, Mapping
+from typing import Any, cast, Optional
 
 import equinox as eqx
 import jax
@@ -26,8 +27,8 @@ import sympy
 
 PyTree = Any
 
-concatenate = sympy.Function("concatenate")
-stack = sympy.Function("stack")
+concatenate: Callable = sympy.Function("concatenate")  # pyright: ignore
+stack: Callable = sympy.Function("stack")  # pyright: ignore
 
 
 def _reduce(fn):
@@ -96,9 +97,16 @@ _reverse_lookup = {v: k for k, v in _lookup.items()}
 assert len(_reverse_lookup) == len(_lookup)
 
 
+def _item(x):
+    if eqx.is_array(x):
+        return x.item()
+    else:
+        return x
+
+
 class _AbstractNode(eqx.Module):
     @abc.abstractmethod
-    def __call__(self, memodict: dict):
+    def __call__(self, memodict: dict) -> jax.typing.ArrayLike:
         ...
 
     @abc.abstractmethod
@@ -107,14 +115,14 @@ class _AbstractNode(eqx.Module):
 
     # Comparisons based on identity
     __hash__ = object.__hash__
-    __eq__ = object.__eq__
+    __eq__ = object.__eq__  # pyright: ignore
 
 
 class _Symbol(_AbstractNode):
     _name: str
 
     def __init__(self, expr: sympy.Expr):
-        self._name = expr.name
+        self._name = expr.name  # pyright: ignore
 
     def __call__(self, memodict: dict):
         try:
@@ -135,7 +143,7 @@ def _maybe_array(val, make_array):
 
 
 class _Integer(_AbstractNode):
-    _value: jnp.ndarray
+    _value: jax.typing.ArrayLike
 
     def __init__(self, expr: sympy.Expr, make_array: bool):
         assert isinstance(expr, sympy.Integer)
@@ -146,11 +154,11 @@ class _Integer(_AbstractNode):
 
     def sympy(self, memodict: dict, func_lookup: dict) -> sympy.Expr:
         # memodict not needed as sympy deduplicates internally
-        return sympy.Integer(self._value.item())
+        return sympy.Integer(_item(self._value))
 
 
 class _Float(_AbstractNode):
-    _value: jnp.ndarray
+    _value: jax.typing.ArrayLike
 
     def __init__(self, expr: sympy.Expr, make_array: bool):
         assert isinstance(expr, sympy.Float)
@@ -161,12 +169,12 @@ class _Float(_AbstractNode):
 
     def sympy(self, memodict: dict, func_lookup: dict) -> sympy.Expr:
         # memodict not needed as sympy deduplicates internally
-        return sympy.Float(self._value.item())
+        return sympy.Float(_item(self._value))
 
 
 class _Rational(_AbstractNode):
-    _numerator: jnp.ndarray
-    _denominator: jnp.ndarray
+    _numerator: jax.typing.ArrayLike
+    _denominator: jax.typing.ArrayLike
 
     def __init__(self, expr: sympy.Expr, make_array: bool):
         assert isinstance(expr, sympy.Rational)
@@ -185,7 +193,9 @@ class _Rational(_AbstractNode):
 
     def sympy(self, memodict: dict, func_lookup: dict) -> sympy.Expr:
         # memodict not needed as sympy deduplicates internally
-        return sympy.Integer(self._numerator) / sympy.Integer(self._denominator)
+        return sympy.Integer(_item(self._numerator)) / sympy.Integer(
+            _item(self._denominator)
+        )
 
 class _Constant(_AbstractNode):
     _value: jnp.ndarray
@@ -215,14 +225,15 @@ class _Func(_AbstractNode):
     _args: list
 
     def __init__(
-        self, expr: sympy.Expr, memodict: dict, func_lookup: dict, make_array: bool
+        self, expr: sympy.Expr, memodict: dict, func_lookup: Mapping, make_array: bool
     ):
         try:
             self._func = func_lookup[expr.func]
         except KeyError as e:
             raise KeyError(f"Unsupported Sympy type {type(expr)}") from e
         self._args = [
-            _sympy_to_node(arg, memodict, func_lookup, make_array) for arg in expr.args
+            _sympy_to_node(cast(sympy.Expr, arg), memodict, func_lookup, make_array)
+            for arg in expr.args
         ]
 
     def __call__(self, memodict: dict):
@@ -248,7 +259,7 @@ class _Func(_AbstractNode):
 
 
 def _sympy_to_node(
-    expr: sympy.Expr, memodict: dict, func_lookup: dict, make_array: bool
+    expr: sympy.Expr, memodict: dict, func_lookup: Mapping, make_array: bool
 ) -> _AbstractNode:
     try:
         return memodict[expr]
@@ -282,9 +293,7 @@ class SymbolicModule(eqx.Module):
         expressions: PyTree,
         extra_funcs: Optional[dict] = None,
         make_array: bool = True,
-        **kwargs,
     ):
-        super().__init__(**kwargs)
         if extra_funcs is None:
             lookup = _lookup
             self.has_extra_funcs = False
@@ -302,7 +311,8 @@ class SymbolicModule(eqx.Module):
     def sympy(self) -> sympy.Expr:
         if self.has_extra_funcs:
             raise NotImplementedError(
-                "SymbolicModule cannot be converted back to SymPy if `extra_funcs` is passed"
+                "SymbolicModule cannot be converted back to SymPy if `extra_funcs` "
+                "is passed."
             )
         memodict = dict()
         return jax.tree_map(

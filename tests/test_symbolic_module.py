@@ -16,14 +16,15 @@ import equinox as eqx
 import jax
 import jax.numpy as jnp
 import jax.random as jr
+import jax.tree_util as jtu
 import sympy
 
 import sympy2jax
 
 
 def assert_equal(x, y):
-    x_leaves, x_tree = jax.tree_flatten(x)
-    y_leaves, y_tree = jax.tree_flatten(y)
+    x_leaves, x_tree = jtu.tree_flatten(x)
+    y_leaves, y_tree = jtu.tree_flatten(y)
     assert x_tree == y_tree
     for xi, yi in zip(x_leaves, y_leaves):
         assert type(xi) is type(yi)
@@ -44,10 +45,10 @@ def assert_sympy_allclose(x, y):
     elif isinstance(x, sympy.Integer):
         assert x == y
     elif isinstance(x, sympy.Rational):
-        assert x.numerator == y.numerator
-        assert x.denominator == y.denominator
+        assert x.numerator == y.numerator  # pyright: ignore
+        assert x.denominator == y.denominator  # pyright: ignore
     elif isinstance(x, sympy.Symbol):
-        assert x.name == y.name
+        assert x.name == y.name  # pyright: ignore
     else:
         assert len(x.args) == len(y.args)
         for xarg, yarg in zip(x.args, y.args):
@@ -62,7 +63,7 @@ def test_example():
 
     x = jax.numpy.zeros(3)
     out = mod(x_sym=x)
-    params = jax.tree_leaves(mod)
+    params = jtu.tree_leaves(mod)
 
     assert_equal(out, [jnp.cos(x), 2 * jnp.sin(x)])
     assert_equal(
@@ -148,7 +149,7 @@ def test_extra_funcs():
     mod(x=1.0, y=2.0)
 
     def _get_params(module):
-        return {id(x) for x in jax.tree_leaves(module) if eqx.is_array(x)}
+        return {id(x) for x in jtu.tree_leaves(module) if eqx.is_array(x)}
 
     assert _get_params(mod).issuperset(_get_params(mlp))
 
@@ -171,3 +172,8 @@ def test_stack():
         mod(x=jnp.array(0.4), y=jnp.array(0.5), z=jnp.array(0.6)),
         jnp.array([0.4, 0.5, 0.6]),
     )
+
+
+def test_non_array_to_sympy():
+    mod = sympy2jax.SymbolicModule(expressions=[sympy.Integer(1)], make_array=False)
+    assert mod.sympy() == [sympy.Integer(1)]
