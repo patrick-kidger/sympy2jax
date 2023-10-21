@@ -123,6 +123,14 @@ def test_rational():
     assert mod.sympy() == y
 
 
+def test_constants():
+    x = sympy.symbols("x")
+    y = x + sympy.pi + sympy.E + sympy.EulerGamma + sympy.I
+    mod = sympy2jax.SymbolicModule(y)
+    assert jnp.isclose(mod(x=1.0), 1 + jnp.pi + jnp.e + jnp.euler_gamma + 1j)
+    assert mod.sympy() == y
+
+
 def test_extra_funcs():
     class _MLP(eqx.Module):
         mlp: eqx.nn.MLP

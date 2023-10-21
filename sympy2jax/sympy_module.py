@@ -187,6 +187,28 @@ class _Rational(_AbstractNode):
         # memodict not needed as sympy deduplicates internally
         return sympy.Integer(self._numerator) / sympy.Integer(self._denominator)
 
+class _Constant(_AbstractNode):
+    _value: jnp.ndarray
+    _expr: sympy.Expr
+
+    _constant_lookup = {
+        sympy.E: jnp.e,
+        sympy.pi: jnp.pi,
+        sympy.EulerGamma: jnp.euler_gamma,
+        sympy.I: 1j,
+    }
+    def __init__(self, expr: sympy.Expr, make_array: bool):
+        assert expr in (sympy.E, sympy.pi, sympy.EulerGamma, sympy.I)
+        self._value = _maybe_array(self._constant_lookup[expr], make_array)
+        self._expr = expr
+
+    def __call__(self, memodict: dict):
+        return self._value
+
+    def sympy(self, memodict: dict, func_lookup: dict) -> sympy.Expr:
+        # memodict not needed as sympy deduplicates internally
+        return self._expr
+
 
 class _Func(_AbstractNode):
     _func: Callable
@@ -239,6 +261,8 @@ def _sympy_to_node(
             out = _Float(expr, make_array)
         elif isinstance(expr, sympy.Rational):
             out = _Rational(expr, make_array)
+        elif expr in (sympy.E, sympy.pi, sympy.EulerGamma, sympy.I):
+            out = _Constant(expr, make_array)
         else:
             out = _Func(expr, memodict, func_lookup, make_array)
         memodict[expr] = out
