@@ -204,6 +204,7 @@ class _Rational(_AbstractNode):
             _item(self._denominator)
         )
 
+
 class _Constant(_AbstractNode):
     _value: jnp.ndarray
     _expr: sympy.Expr
