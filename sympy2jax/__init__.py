@@ -12,7 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .sympy_module import concatenate, stack, SymbolicModule
+from .sympy_module import (
+    concatenate as concatenate,
+    stack as stack,
+    SymbolicModule as SymbolicModule,
+)
 
 
 __version__ = "0.0.4"
