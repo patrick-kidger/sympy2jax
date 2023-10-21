@@ -93,6 +93,13 @@ _lookup = {
     sympy.Determinant: jnp.linalg.det,
 }
 
+_constant_lookup = {
+    sympy.E: jnp.e,
+    sympy.pi: jnp.pi,
+    sympy.EulerGamma: jnp.euler_gamma,
+    sympy.I: 1j,
+}
+
 _reverse_lookup = {v: k for k, v in _lookup.items()}
 assert len(_reverse_lookup) == len(_lookup)
 
@@ -198,6 +205,22 @@ class _Rational(_AbstractNode):
         )
 
 
+class _Constant(_AbstractNode):
+    _value: jnp.ndarray
+    _expr: sympy.Expr
+
+    def __init__(self, expr: sympy.Expr, make_array: bool):
+        assert expr in _constant_lookup
+        self._value = _maybe_array(_constant_lookup[expr], make_array)
+        self._expr = expr
+
+    def __call__(self, memodict: dict):
+        return self._value
+
+    def sympy(self, memodict: dict, func_lookup: dict) -> sympy.Expr:
+        return self._expr
+
+
 class _Func(_AbstractNode):
     _func: Callable
     _args: list
@@ -250,6 +273,8 @@ def _sympy_to_node(
             out = _Float(expr, make_array)
         elif isinstance(expr, sympy.Rational):
             out = _Rational(expr, make_array)
+        elif expr in (sympy.E, sympy.pi, sympy.EulerGamma, sympy.I):
+            out = _Constant(expr, make_array)
         else:
             out = _Func(expr, memodict, func_lookup, make_array)
         memodict[expr] = out
