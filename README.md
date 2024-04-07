@@ -37,7 +37,7 @@ params = jax.tree_leaves(mod)  # 1.0 and 2.0 are parameters.
 ## Documentation
 
 ```python
-sympytorch.SymbolicModule(expressions, extra_funcs=None, make_array=True)
+sympy2jax.SymbolicModule(expressions, extra_funcs=None, make_array=True)
 ```
 
 Where:
