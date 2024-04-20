@@ -51,32 +51,23 @@ Instances have a `.sympy()` method that translates the module back into a PyTree
 
 (That's literally the entire documentation, it's super easy.)
 
-## Finally
+## See also: other libraries in the JAX ecosystem
 
-### See also: other libraries in the JAX ecosystem
+**Always useful**  
+[Equinox](https://github.com/patrick-kidger/equinox): neural networks and everything not already in core JAX!  
+[jaxtyping](https://github.com/patrick-kidger/jaxtyping): type annotations for shape/dtype of arrays.  
 
-[jaxtyping](https://github.com/google/jaxtyping): type annotations for shape/dtype of arrays.
+**Deep learning**  
+[Optax](https://github.com/deepmind/optax): first-order gradient (SGD, Adam, ...) optimisers.  
+[Orbax](https://github.com/google/orbax): checkpointing (async/multi-host/multi-device).  
+[Levanter](https://github.com/stanford-crfm/levanter): scalable+reliable training of foundation models (e.g. LLMs).  
 
-[Equinox](https://github.com/patrick-kidger/equinox): neural networks.
+**Scientific computing**  
+[Diffrax](https://github.com/patrick-kidger/diffrax): numerical differential equation solvers.  
+[Optimistix](https://github.com/patrick-kidger/optimistix): root finding, minimisation, fixed points, and least squares.  
+[Lineax](https://github.com/patrick-kidger/lineax): linear solvers.  
+[BlackJAX](https://github.com/blackjax-devs/blackjax): probabilistic+Bayesian sampling.  
+[PySR](https://github.com/milesCranmer/PySR): symbolic regression. (Non-JAX honourable mention!)  
 
-[Optax](https://github.com/deepmind/optax): first-order gradient (SGD, Adam, ...) optimisers.
-
-[Diffrax](https://github.com/patrick-kidger/diffrax): numerical differential equation solvers.
-
-[Optimistix](https://github.com/patrick-kidger/optimistix): root finding, minimisation, fixed points, and least squares.
-
-[Lineax](https://github.com/google/lineax): linear solvers.
-
-[BlackJAX](https://github.com/blackjax-devs/blackjax): probabilistic+Bayesian sampling.
-
-[Orbax](https://github.com/google/orbax): checkpointing (async/multi-host/multi-device).
-
-[Eqxvision](https://github.com/paganpasta/eqxvision): computer vision models.
-
-[Levanter](https://github.com/stanford-crfm/levanter): scalable+reliable training of foundation models (e.g. LLMs).
-
-[PySR](https://github.com/milesCranmer/PySR): symbolic regression. (Non-JAX honourable mention!)
-
-### Disclaimer
-
-This is not an official Google product.
+**Awesome JAX**  
+[Awesome JAX](https://github.com/n2cholas/awesome-jax): a longer list of other JAX projects.  
