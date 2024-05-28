@@ -1,6 +1,6 @@
 [project]
 name = "sympy2jax"
-version = "0.0.5"
+version = "0.0.6"
 description = "Turn SymPy expressions into trainable JAX expressions."
 readme = "README.md"
 requires-python ="~=3.9"
