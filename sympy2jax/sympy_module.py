@@ -129,7 +129,7 @@ class _Symbol(_AbstractNode):
     _name: str
 
     def __init__(self, expr: sympy.Expr):
-        self._name = expr.name  # pyright: ignore
+        self._name = str(expr.name)  # pyright: ignore
 
     def __call__(self, memodict: dict):
         try:
