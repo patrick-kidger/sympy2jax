@@ -57,8 +57,8 @@ def assert_sympy_allclose(x, y):
 
 def test_example():
     x_sym = sympy.symbols("x_sym")
-    cosx = 1.0 * sympy.cos(x_sym)
-    sinx = 2.0 * sympy.sin(x_sym)
+    cosx = 1.0 * sympy.cos(x_sym)  # pyright: ignore[reportOperatorIssue]
+    sinx = 2.0 * sympy.sin(x_sym)  # pyright: ignore[reportOperatorIssue]
     mod = sympy2jax.SymbolicModule([cosx, sinx])
 
     x = jax.numpy.zeros(3)
