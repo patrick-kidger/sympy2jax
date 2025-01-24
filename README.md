@@ -61,6 +61,7 @@ Instances have a `.sympy()` method that translates the module back into a PyTree
 [Optax](https://github.com/deepmind/optax): first-order gradient (SGD, Adam, ...) optimisers.  
 [Orbax](https://github.com/google/orbax): checkpointing (async/multi-host/multi-device).  
 [Levanter](https://github.com/stanford-crfm/levanter): scalable+reliable training of foundation models (e.g. LLMs).  
+[paramax](https://github.com/danielward27/paramax): parameterizations and constraints for PyTrees.  
 
 **Scientific computing**  
 [Diffrax](https://github.com/patrick-kidger/diffrax): numerical differential equation solvers.  
