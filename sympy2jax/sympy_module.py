@@ -22,6 +22,7 @@ import equinox as eqx
 import jax
 import jax.numpy as jnp
 import jax.scipy as jsp
+import jax.tree_util as jtu
 import sympy
 
 
@@ -307,7 +308,7 @@ class SymbolicModule(eqx.Module):
             func_lookup=lookup,
             make_array=make_array,
         )
-        self.nodes = jax.tree_map(_convert, expressions)
+        self.nodes = jtu.tree_map(_convert, expressions)
 
     def sympy(self) -> sympy.Expr:
         if self.has_extra_funcs:
@@ -316,10 +317,10 @@ class SymbolicModule(eqx.Module):
                 "is passed."
             )
         memodict = dict()
-        return jax.tree_map(
+        return jtu.tree_map(
             lambda n: n.sympy(memodict, _reverse_lookup), self.nodes, is_leaf=_is_node
         )
 
     def __call__(self, **symbols):
         memodict = symbols
-        return jax.tree_map(lambda n: n(memodict), self.nodes, is_leaf=_is_node)
+        return jtu.tree_map(lambda n: n(memodict), self.nodes, is_leaf=_is_node)
