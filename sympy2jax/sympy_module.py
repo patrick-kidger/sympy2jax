@@ -23,13 +23,13 @@ import jax
 import jax.numpy as jnp
 import jax.scipy as jsp
 import jax.tree_util as jtu
-import sympy
+import sympy as sympy_module
 
 
 PyTree = Any
 
-concatenate: Callable = sympy.Function("concatenate")  # pyright: ignore
-stack: Callable = sympy.Function("stack")  # pyright: ignore
+concatenate: Callable = sympy_module.Function("concatenate")  # pyright: ignore
+stack: Callable = sympy_module.Function("stack")  # pyright: ignore
 
 
 def _reduce(fn):
@@ -49,56 +49,56 @@ def _single_args(fn):
 _lookup = {
     concatenate: _single_args(jnp.concatenate),
     stack: _single_args(jnp.stack),
-    sympy.Mul: _reduce(jnp.multiply),
-    sympy.Add: _reduce(jnp.add),
-    sympy.div: jnp.divide,
-    sympy.Abs: jnp.abs,
-    sympy.sign: jnp.sign,
-    sympy.ceiling: jnp.ceil,
-    sympy.floor: jnp.floor,
-    sympy.log: jnp.log,
-    sympy.exp: jnp.exp,
-    sympy.sqrt: jnp.sqrt,
-    sympy.cos: jnp.cos,
-    sympy.acos: jnp.arccos,
-    sympy.sin: jnp.sin,
-    sympy.asin: jnp.arcsin,
-    sympy.tan: jnp.tan,
-    sympy.atan: jnp.arctan,
-    sympy.atan2: jnp.arctan2,
-    sympy.cosh: jnp.cosh,
-    sympy.acosh: jnp.arccosh,
-    sympy.sinh: jnp.sinh,
-    sympy.asinh: jnp.arcsinh,
-    sympy.tanh: jnp.tanh,
-    sympy.atanh: jnp.arctanh,
-    sympy.Pow: jnp.power,
-    sympy.re: jnp.real,
-    sympy.im: jnp.imag,
-    sympy.arg: jnp.angle,
-    sympy.erf: jsp.special.erf,
-    sympy.Eq: jnp.equal,
-    sympy.Ne: jnp.not_equal,
-    sympy.StrictGreaterThan: jnp.greater,
-    sympy.StrictLessThan: jnp.less,
-    sympy.LessThan: jnp.less_equal,
-    sympy.GreaterThan: jnp.greater_equal,
-    sympy.And: jnp.logical_and,
-    sympy.Or: jnp.logical_or,
-    sympy.Not: jnp.logical_not,
-    sympy.Xor: jnp.logical_xor,
-    sympy.Max: _reduce(jnp.maximum),
-    sympy.Min: _reduce(jnp.minimum),
-    sympy.MatAdd: _reduce(jnp.add),
-    sympy.Trace: jnp.trace,
-    sympy.Determinant: jnp.linalg.det,
+    sympy_module.Mul: _reduce(jnp.multiply),
+    sympy_module.Add: _reduce(jnp.add),
+    sympy_module.div: jnp.divide,
+    sympy_module.Abs: jnp.abs,
+    sympy_module.sign: jnp.sign,
+    sympy_module.ceiling: jnp.ceil,
+    sympy_module.floor: jnp.floor,
+    sympy_module.log: jnp.log,
+    sympy_module.exp: jnp.exp,
+    sympy_module.sqrt: jnp.sqrt,
+    sympy_module.cos: jnp.cos,
+    sympy_module.acos: jnp.arccos,
+    sympy_module.sin: jnp.sin,
+    sympy_module.asin: jnp.arcsin,
+    sympy_module.tan: jnp.tan,
+    sympy_module.atan: jnp.arctan,
+    sympy_module.atan2: jnp.arctan2,
+    sympy_module.cosh: jnp.cosh,
+    sympy_module.acosh: jnp.arccosh,
+    sympy_module.sinh: jnp.sinh,
+    sympy_module.asinh: jnp.arcsinh,
+    sympy_module.tanh: jnp.tanh,
+    sympy_module.atanh: jnp.arctanh,
+    sympy_module.Pow: jnp.power,
+    sympy_module.re: jnp.real,
+    sympy_module.im: jnp.imag,
+    sympy_module.arg: jnp.angle,
+    sympy_module.erf: jsp.special.erf,
+    sympy_module.Eq: jnp.equal,
+    sympy_module.Ne: jnp.not_equal,
+    sympy_module.StrictGreaterThan: jnp.greater,
+    sympy_module.StrictLessThan: jnp.less,
+    sympy_module.LessThan: jnp.less_equal,
+    sympy_module.GreaterThan: jnp.greater_equal,
+    sympy_module.And: jnp.logical_and,
+    sympy_module.Or: jnp.logical_or,
+    sympy_module.Not: jnp.logical_not,
+    sympy_module.Xor: jnp.logical_xor,
+    sympy_module.Max: _reduce(jnp.maximum),
+    sympy_module.Min: _reduce(jnp.minimum),
+    sympy_module.MatAdd: _reduce(jnp.add),
+    sympy_module.Trace: jnp.trace,
+    sympy_module.Determinant: jnp.linalg.det,
 }
 
 _constant_lookup = {
-    sympy.E: jnp.e,
-    sympy.pi: jnp.pi,
-    sympy.EulerGamma: jnp.euler_gamma,
-    sympy.I: 1j,
+    sympy_module.E: jnp.e,
+    sympy_module.pi: jnp.pi,
+    sympy_module.EulerGamma: jnp.euler_gamma,
+    sympy_module.I: 1j,
 }
 
 _reverse_lookup = {v: k for k, v in _lookup.items()}
@@ -118,7 +118,7 @@ class _AbstractNode(eqx.Module):
         ...
 
     @abc.abstractmethod
-    def sympy(self, memodict: dict, func_lookup: dict) -> sympy.Expr:
+    def sympy(self, memodict: dict, func_lookup: dict) -> sympy_module.Expr:
         ...
 
     # Comparisons based on identity
@@ -129,7 +129,7 @@ class _AbstractNode(eqx.Module):
 class _Symbol(_AbstractNode):
     _name: str
 
-    def __init__(self, expr: sympy.Expr):
+    def __init__(self, expr: sympy_module.Expr):
         self._name = str(expr.name)  # pyright: ignore
 
     def __call__(self, memodict: dict):
@@ -138,9 +138,9 @@ class _Symbol(_AbstractNode):
         except KeyError as e:
             raise KeyError(f"Missing input for symbol {self._name}") from e
 
-    def sympy(self, memodict: dict, func_lookup: dict) -> sympy.Expr:
+    def sympy(self, memodict: dict, func_lookup: dict) -> sympy_module.Expr:
         # memodict not needed as sympy deduplicates internally
-        return sympy.Symbol(self._name)
+        return sympy_module.Symbol(self._name)
 
 
 def _maybe_array(val, make_array):
@@ -153,39 +153,39 @@ def _maybe_array(val, make_array):
 class _Integer(_AbstractNode):
     _value: jax.typing.ArrayLike
 
-    def __init__(self, expr: sympy.Expr, make_array: bool):
-        assert isinstance(expr, sympy.Integer)
+    def __init__(self, expr: sympy_module.Expr, make_array: bool):
+        assert isinstance(expr, sympy_module.Integer)
         self._value = _maybe_array(int(expr), make_array)
 
     def __call__(self, memodict: dict):
         return self._value
 
-    def sympy(self, memodict: dict, func_lookup: dict) -> sympy.Expr:
+    def sympy(self, memodict: dict, func_lookup: dict) -> sympy_module.Expr:
         # memodict not needed as sympy deduplicates internally
-        return sympy.Integer(_item(self._value))
+        return sympy_module.Integer(_item(self._value))
 
 
 class _Float(_AbstractNode):
     _value: jax.typing.ArrayLike
 
-    def __init__(self, expr: sympy.Expr, make_array: bool):
-        assert isinstance(expr, sympy.Float)
+    def __init__(self, expr: sympy_module.Expr, make_array: bool):
+        assert isinstance(expr, sympy_module.Float)
         self._value = _maybe_array(float(expr), make_array)
 
     def __call__(self, memodict: dict):
         return self._value
 
-    def sympy(self, memodict: dict, func_lookup: dict) -> sympy.Expr:
+    def sympy(self, memodict: dict, func_lookup: dict) -> sympy_module.Expr:
         # memodict not needed as sympy deduplicates internally
-        return sympy.Float(_item(self._value))
+        return sympy_module.Float(_item(self._value))
 
 
 class _Rational(_AbstractNode):
     _numerator: jax.typing.ArrayLike
     _denominator: jax.typing.ArrayLike
 
-    def __init__(self, expr: sympy.Expr, make_array: bool):
-        assert isinstance(expr, sympy.Rational)
+    def __init__(self, expr: sympy_module.Expr, make_array: bool):
+        assert isinstance(expr, sympy_module.Rational)
         numerator = expr.numerator
         denominator = expr.denominator
         if callable(numerator):
@@ -199,18 +199,18 @@ class _Rational(_AbstractNode):
     def __call__(self, memodict: dict):
         return self._numerator / self._denominator
 
-    def sympy(self, memodict: dict, func_lookup: dict) -> sympy.Expr:
+    def sympy(self, memodict: dict, func_lookup: dict) -> sympy_module.Expr:
         # memodict not needed as sympy deduplicates internally
-        return sympy.Integer(_item(self._numerator)) / sympy.Integer(
+        return sympy_module.Integer(_item(self._numerator)) / sympy_module.Integer(
             _item(self._denominator)
         )
 
 
 class _Constant(_AbstractNode):
     _value: jnp.ndarray
-    _expr: sympy.Expr
+    _expr: sympy_module.Expr
 
-    def __init__(self, expr: sympy.Expr, make_array: bool):
+    def __init__(self, expr: sympy_module.Expr, make_array: bool):
         assert expr in _constant_lookup
         self._value = _maybe_array(_constant_lookup[expr], make_array)
         self._expr = expr
@@ -218,7 +218,7 @@ class _Constant(_AbstractNode):
     def __call__(self, memodict: dict):
         return self._value
 
-    def sympy(self, memodict: dict, func_lookup: dict) -> sympy.Expr:
+    def sympy(self, memodict: dict, func_lookup: dict) -> sympy_module.Expr:
         return self._expr
 
 
@@ -227,14 +227,20 @@ class _Func(_AbstractNode):
     _args: list
 
     def __init__(
-        self, expr: sympy.Expr, memodict: dict, func_lookup: Mapping, make_array: bool
+        self,
+        expr: sympy_module.Expr,
+        memodict: dict,
+        func_lookup: Mapping,
+        make_array: bool,
     ):
         try:
             self._func = func_lookup[expr.func]
         except KeyError as e:
             raise KeyError(f"Unsupported Sympy type {type(expr)}") from e
         self._args = [
-            _sympy_to_node(cast(sympy.Expr, arg), memodict, func_lookup, make_array)
+            _sympy_to_node(
+                cast(sympy_module.Expr, arg), memodict, func_lookup, make_array
+            )
             for arg in expr.args
         ]
 
@@ -249,7 +255,7 @@ class _Func(_AbstractNode):
             args.append(arg_call)
         return self._func(*args)
 
-    def sympy(self, memodict: dict, func_lookup: dict) -> sympy.Expr:
+    def sympy(self, memodict: dict, func_lookup: dict) -> sympy_module.Expr:
         try:
             return memodict[self]
         except KeyError:
@@ -261,20 +267,25 @@ class _Func(_AbstractNode):
 
 
 def _sympy_to_node(
-    expr: sympy.Expr, memodict: dict, func_lookup: Mapping, make_array: bool
+    expr: sympy_module.Expr, memodict: dict, func_lookup: Mapping, make_array: bool
 ) -> _AbstractNode:
     try:
         return memodict[expr]
     except KeyError:
-        if isinstance(expr, sympy.Symbol):
+        if isinstance(expr, sympy_module.Symbol):
             out = _Symbol(expr)
-        elif isinstance(expr, sympy.Integer):
+        elif isinstance(expr, sympy_module.Integer):
             out = _Integer(expr, make_array)
-        elif isinstance(expr, sympy.Float):
+        elif isinstance(expr, sympy_module.Float):
             out = _Float(expr, make_array)
-        elif isinstance(expr, sympy.Rational):
+        elif isinstance(expr, sympy_module.Rational):
             out = _Rational(expr, make_array)
-        elif expr in (sympy.E, sympy.pi, sympy.EulerGamma, sympy.I):
+        elif expr in (
+            sympy_module.E,
+            sympy_module.pi,
+            sympy_module.EulerGamma,
+            sympy_module.I,
+        ):
             out = _Constant(expr, make_array)
         else:
             out = _Func(expr, memodict, func_lookup, make_array)
@@ -288,7 +299,7 @@ def _is_node(x):
 
 class SymbolicModule(eqx.Module):
     nodes: PyTree
-    has_extra_funcs: bool = eqx.static_field()
+    has_extra_funcs: bool = eqx.field(static=True)
 
     def __init__(
         self,
@@ -310,7 +321,7 @@ class SymbolicModule(eqx.Module):
         )
         self.nodes = jtu.tree_map(_convert, expressions)
 
-    def sympy(self) -> sympy.Expr:
+    def sympy(self) -> sympy_module.Expr:
         if self.has_extra_funcs:
             raise NotImplementedError(
                 "SymbolicModule cannot be converted back to SymPy if `extra_funcs` "
