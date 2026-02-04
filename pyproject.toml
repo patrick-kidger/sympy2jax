@@ -1,6 +1,6 @@
 [project]
 name = "sympy2jax"
-version = "0.0.7"
+version = "0.0.8"
 description = "Turn SymPy expressions into trainable JAX expressions."
 readme = "README.md"
 requires-python ="~=3.9"
@@ -31,13 +31,13 @@ include = ["sympy2jax/*"]
 [tool.pytest.ini_options]
 addopts = "--jaxtyping-packages=symyp2jax,beartype.beartype(conf=beartype.BeartypeConf(strategy=beartype.BeartypeStrategy.On))"
 
-[tool.ruff]
+[tool.ruff.lint]
 select = ["E", "F", "I001"]
 ignore = ["E402", "E721", "E731", "E741", "F722"]
 ignore-init-module-imports = true
 fixable = ["I001", "F401"]
 
-[tool.ruff.isort]
+[tool.ruff.lint.isort]
 combine-as-imports = true
 lines-after-imports = 2
 extra-standard-library = ["typing_extensions"]
