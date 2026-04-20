@@ -1,48 +1,62 @@
-[project]
-name = "sympy2jax"
-version = "0.0.8"
-description = "Turn SymPy expressions into trainable JAX expressions."
-readme = "README.md"
-requires-python ="~=3.9"
-license = {file = "LICENSE"}
-authors = [
-  {name = "Patrick Kidger", email = "contact@kidger.site"},
-]
-keywords = ["jax", "sympy", "equinox"]
-classifiers = [
-    "Development Status :: 3 - Alpha",
-    "Intended Audience :: Science/Research",
-    "License :: OSI Approved :: Apache Software License",
-    "Natural Language :: English",
-    "Programming Language :: Python :: 3",
-    "Topic :: Scientific/Engineering :: Artificial Intelligence",
-    "Topic :: Scientific/Engineering :: Mathematics",
-]
-urls = {repository = "https://github.com/google/sympy2jax" }
-dependencies = ["equinox>=0.5.3", "jax>=0.3.4", "sympy>=1.7.1"]
-
 [build-system]
-requires = ["hatchling"]
 build-backend = "hatchling.build"
+requires = ["hatchling"]
+
+[dependency-groups]
+dev = [
+  "prek==0.3.9",
+  "pyright==1.1.350",
+  "ruff==0.13.0",
+  "toml-sort==0.23.1"
+]
+tests = [
+  "jaxlib",
+  "pytest"
+]
+
+[project]
+authors = [
+  {email = "contact@kidger.site", name = "Patrick Kidger"}
+]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: Apache Software License",
+  "Natural Language :: English",
+  "Programming Language :: Python :: 3",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+  "Topic :: Scientific/Engineering :: Mathematics"
+]
+dependencies = ["equinox>=0.5.3", "jax>=0.3.4", "sympy>=1.7.1"]
+description = "Turn SymPy expressions into trainable JAX expressions."
+keywords = ["jax", "sympy", "equinox"]
+license = {file = "LICENSE"}
+name = "sympy2jax"
+readme = "README.md"
+requires-python = "~=3.9"
+urls = {repository = "https://github.com/google/sympy2jax"}
+version = "0.0.8"
 
 [tool.hatch.build]
 include = ["sympy2jax/*"]
+
+[tool.pyright]
+include = ["sympy2jax", "tests"]
+reportIncompatibleMethodOverride = true
 
 [tool.pytest.ini_options]
 addopts = "--jaxtyping-packages=symyp2jax,beartype.beartype(conf=beartype.BeartypeConf(strategy=beartype.BeartypeStrategy.On))"
 
 [tool.ruff.lint]
-select = ["E", "F", "I001"]
-ignore = ["E402", "E721", "E731", "E741", "F722"]
-ignore-init-module-imports = true
 fixable = ["I001", "F401"]
+ignore = ["E402", "E721", "E731", "E741", "F722"]
+select = ["E", "F", "I001"]
 
 [tool.ruff.lint.isort]
 combine-as-imports = true
-lines-after-imports = 2
 extra-standard-library = ["typing_extensions"]
+lines-after-imports = 2
 order-by-type = false
 
-[tool.pyright]
-reportIncompatibleMethodOverride = true
-include = ["sympy2jax", "tests"]
+[tool.uv]
+default-groups = ["dev", "tests"]

@@ -114,12 +114,10 @@ def _item(x):
 
 class _AbstractNode(eqx.Module):
     @abc.abstractmethod
-    def __call__(self, memodict: dict) -> jax.typing.ArrayLike:
-        ...
+    def __call__(self, memodict: dict) -> jax.typing.ArrayLike: ...
 
     @abc.abstractmethod
-    def sympy(self, memodict: dict, func_lookup: dict) -> sympy_module.Expr:
-        ...
+    def sympy(self, memodict: dict, func_lookup: dict) -> sympy_module.Expr: ...
 
     # Comparisons based on identity
     __hash__ = object.__hash__
