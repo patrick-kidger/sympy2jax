@@ -1,14 +1,38 @@
+fail_fast: true
 repos:
-  - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.2.2
+  - repo: meta
     hooks:
-      - id: ruff-format  # formatter
-        types_or: [ python, pyi, jupyter ]
-      - id: ruff  # linter
-        types_or: [ python, pyi, jupyter ]
-        args: [ --fix ]
-  - repo: https://github.com/RobertCraigie/pyright-python
-    rev: v1.1.350
+    - id: check-hooks-apply
+    - id: check-useless-excludes
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
     hooks:
-    - id: pyright
-      additional_dependencies: [equinox, jax, sympy]
+    - id: trailing-whitespace
+      exclude: \.md$
+    - id: check-toml
+    - id: mixed-line-ending
+  - repo: local
+    hooks:
+      - id: sort-pyproject
+        name: sort pyproject
+        files: ^pyproject\.toml$
+        language: system
+        entry: uv run -- toml-sort -i --sort-table-keys --sort-inline-tables
+      - id: ruff-format
+        name: ruff format
+        types_or: [python, pyi, jupyter, toml]
+        language: system
+        entry: uv run -- ruff format --
+        require_serial: true
+      - id: ruff-lint
+        name: ruff lint
+        types_or: [python, pyi, jupyter, toml]
+        language: system
+        entry: uv run -- ruff check --fix --
+        require_serial: true
+      - id: pyright
+        name: pyright
+        types_or: [python]
+        language: system
+        entry: uv run -- pyright
+        require_serial: true
